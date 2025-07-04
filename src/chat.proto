@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package chat_package;
+
+service ChatService {
+  // Unary function
+  rpc SendMessage (Message) returns (SendMessageResponse);
+  // Client streaming
+  rpc SendBulkMessages (stream Message) returns (SendMessageResponse);
+  // Server streaming
+  rpc GetHistory(HistoryRequest) returns (stream Message);
+  // Bidirectional streaming
+  rpc LiveChat(stream Message) returns (stream Message);
+}
+
+message Message {
+  string content = 1;
+}
+
+message SendMessageResponse {
+  int32 messages_processed = 1;
+}
+
+message HistoryRequest {
+  int32 starting_at = 1;
+}

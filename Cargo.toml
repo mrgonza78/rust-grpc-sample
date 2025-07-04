@@ -1,0 +1,13 @@
+[package]
+name = "grpc_sample"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+tokio-stream = "0.1"
+tonic = "0.13"
+prost = "0.13" # not the latest but the ones that works with tonic 0.13
+
+[build-dependencies]
+tonic-build = "0.13"
