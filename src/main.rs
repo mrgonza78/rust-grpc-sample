@@ -8,7 +8,7 @@ use tonic::transport::Server;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let addr = "[::1]:8080".parse().unwrap();
+    let addr = "0.0.0.0:8080".parse().unwrap();
     println!("Server listening on {addr}");
 
     Server::builder()

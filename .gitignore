@@ -1,3 +1,4 @@
 /target
 /clients/rust/target
 Cargo.lock
+.DS_STORE

@@ -6,12 +6,12 @@ use std::error::Error;
 use tokio_stream::StreamExt;
 use tonic::Request;
 
-const server_addr: &str = "http://[::1]:8080";
+const SERVER_ADDR: &str = "http://[::1]:8080";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // Connect to the gRPC server
-    let mut grp_service = ChatServiceClient::connect(server_addr).await?;
+    let mut grp_service = ChatServiceClient::connect(SERVER_ADDR).await?;
 
     // Build your request (replace fields as needed)
     let request = Request::new(HistoryRequest { starting_at: 4 });

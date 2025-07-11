@@ -7,13 +7,13 @@ use std::time::Duration;
 use tokio::time::sleep;
 use tokio_stream::{StreamExt, wrappers::ReceiverStream};
 
-const server_addr: &str = "http://[::1]:8080";
+const SERVER_ADDR: &str = "http://[::1]:8080";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let pid = std::process::id();
     // Connect to the gRPC server
-    let mut grp_service = ChatServiceClient::connect(server_addr).await?;
+    let mut grp_service = ChatServiceClient::connect(SERVER_ADDR).await?;
 
     let (tx, rx) = tokio::sync::mpsc::channel(128);
 
