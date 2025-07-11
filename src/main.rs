@@ -1,16 +1,14 @@
 mod proto;
 mod service;
-// mod unary;
-// mod streaming;
 
-use std::error::Error;
-use tonic::transport::Server;
 use proto::chat_package::chat_service_server::ChatServiceServer;
 use service::MyChatService;
+use std::error::Error;
+use tonic::transport::Server;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let addr = "[::1]:50051".parse().unwrap();
+    let addr = "[::1]:8080".parse().unwrap();
     println!("Server listening on {addr}");
 
     Server::builder()
