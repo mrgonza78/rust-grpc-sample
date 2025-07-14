@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
-	"os"
 	"time"
 
 	proto "grpc-sample-client/protos"
@@ -13,27 +13,34 @@ import (
 )
 
 func main() {
-	var name = "mrgonza78"
-	if len(os.Args) > 1 {
-		name = os.Args[1]
-	}
-
-	var addr = "localhost:50051"
+	var addr = "localhost:8080"
 	// Set up a connection to the server.
 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	gRPCService := proto.NewGreeterClient(conn)
+	gRPCService := proto.NewChatServiceClient(conn)
 
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	response, err := gRPCService.SayHello(ctx, &proto.HelloRequest{Name: name})
+	var request = proto.HistoryRequest{StartingAt: 4}
+	log.Printf("Sending: %v", &request)
+	stream, err := gRPCService.GetHistory(ctx, &request)
 	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+		log.Fatalf("Error starting stream: %v", err)
 	}
-	log.Printf("Response: %v", response)
+
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break // End of stream
+		}
+		if err != nil {
+			log.Fatalf("Error receiving stream: %v", err)
+		}
+		log.Printf("Response: %v", resp)
+	}
 }

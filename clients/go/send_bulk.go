@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -13,38 +14,37 @@ import (
 )
 
 func main() {
-	var name = "mrgonza78"
-	if len(os.Args) > 1 {
-		name = os.Args[1]
-	}
-
-	var addr = "localhost:50051"
+	var addr = "localhost:8080"
 	// Set up a connection to the server.
 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	gRPCService := proto.NewGreeterClient(conn)
+	gRPCService := proto.NewChatServiceClient(conn)
 
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	stream, err := gRPCService.HelloRequests(ctx)
+	stream, err := gRPCService.SendBulkMessages(ctx)
 	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+		log.Fatalf("Error starting stream: %v", err)
 	}
 
-	for range 10 {
-		err := stream.Send(&proto.HelloRequest{Name: name})
+	var pid = os.Getpid()
+	for i := range 100 {
+		var request = proto.Message{Content: fmt.Sprintf("Hi from PID %d. This is test %d", pid, i)}
+		log.Printf("Streaming: %v", &request)
+		err := stream.Send(&request)
 		if err != nil {
-			log.Fatalf("error streaming: %v", err)
+			log.Fatalf("Error streaming: %v", err)
 		}
+		time.Sleep(time.Second) // Sleep for 1 second between sends
 	}
 	response, err := stream.CloseAndRecv()
 	if err != nil {
-		log.Fatalf("error receiving: %v", err)
+		log.Fatalf("Error ending stream: %v", err)
 	}
 	log.Printf("Response: %v", response)
 }

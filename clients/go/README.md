@@ -6,11 +6,12 @@ $ protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt
 ```
 
 ```
-$ go run unary/main.go foo
-2025/07/07 10:21:22 Response: message:"Hello mrgonza78!"
+$ go run send_message.go
+2025/07/14 16:13:37 Response: messages_processed:1
 ```
 
 ```
-$ go run streaming/server/main.go foo
-2025/07/07 10:21:22 Response: message:"Hello mrgonza78!"
+$ go run send_message.go
+...
+2025/07/15 10:31:12 Response: messages_processed:100
 ```

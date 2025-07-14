@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -14,18 +15,21 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func sending(stream proto.Greeter_BidiHelloClient, name string, wg *sync.WaitGroup) {
+func sending(stream proto.ChatService_LiveChatClient, wg *sync.WaitGroup) {
 	defer wg.Done()
-	for {
-		err := stream.Send(&proto.HelloRequest{Name: name})
+	var pid = os.Getpid()
+	for i := range 100 {
+		var request = proto.Message{Content: fmt.Sprintf("Hi from PID %d. This is test %d", pid, i)}
+		log.Printf("Streaming: %v", &request)
+		err := stream.Send(&request)
 		if err != nil {
-			log.Fatalf("could not send: %v", err)
+			log.Fatalf("Error streaming: %v", err)
 		}
 		time.Sleep(2 * time.Second)
 	}
 }
 
-func receiving(stream proto.Greeter_BidiHelloClient, wg *sync.WaitGroup) {
+func receiving(stream proto.ChatService_LiveChatClient, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
 		resp, err := stream.Recv()
@@ -33,32 +37,27 @@ func receiving(stream proto.Greeter_BidiHelloClient, wg *sync.WaitGroup) {
 			break // End of stream
 		}
 		if err != nil {
-			log.Fatalf("error receiving stream: %v", err)
+			log.Fatalf("Error receiving stream: %v", err)
 		}
 		log.Printf("Response: %v", resp)
 	}
 }
 
 func main() {
-	var name = "mrgonza78"
-	if len(os.Args) > 1 {
-		name = os.Args[1]
-	}
-
-	var addr = "localhost:50051"
+	var addr = "localhost:8080"
 	// Set up a connection to the server.
 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	gRPCService := proto.NewGreeterClient(conn)
+	gRPCService := proto.NewChatServiceClient(conn)
 
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	stream, err := gRPCService.BidiHello(ctx)
+	stream, err := gRPCService.LiveChat(ctx)
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
@@ -66,7 +65,7 @@ func main() {
 	var wg sync.WaitGroup
 
 	wg.Add(2)
-	go sending(stream, name, &wg)
+	go sending(stream, &wg)
 	go receiving(stream, &wg)
 
 	wg.Wait()
