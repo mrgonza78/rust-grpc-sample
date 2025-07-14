@@ -125,11 +125,10 @@ impl ChatService for MyChatService {
         println!("get_history request received: {:?}", request);
 
         let (tx, rx) = tokio::sync::mpsc::channel(128);
-        let starting_at = request.into_inner().starting_at as usize;
-
+        let starting_at = request.into_inner().starting_at;
         let messages = self.messages.lock().await;
-        let len = messages.len();
-        for message in messages.iter().skip(len - starting_at) {
+        let len = messages.len() as i32;
+        for message in messages.iter().skip((len - starting_at).max(0) as usize) {
             let _ = send_message(&message, &tx).await;
         }
 
