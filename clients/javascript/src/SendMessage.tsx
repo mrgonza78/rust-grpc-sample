@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ChatServiceClient } from './grpc-web/ChatServiceClientPb';
 import { Message } from './grpc-web/chat_pb';
 
-const client = new ChatServiceClient('http://0.0.0.0:8080');
+const client = new ChatServiceClient(process.env.REACT_APP_GRPC_SERVER || 'http://0.0.0.0:8080');
 
 function SendMessage() {
   const [input, setInput] = useState('');

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ChatServiceClient } from './grpc-web/ChatServiceClientPb';
 import { HistoryRequest, Message } from './grpc-web/chat_pb';
 
-const client = new ChatServiceClient('http://localhost:8080');
+const client = new ChatServiceClient(process.env.REACT_APP_GRPC_SERVER || 'http://0.0.0.0:8080');
 
 const GetHistory: React.FC = () => {
   const [messages, setMessages] = useState<string[]>([]);
