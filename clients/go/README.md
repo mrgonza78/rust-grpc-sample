@@ -4,13 +4,13 @@ Code in this folder implements all 4 kind of gRPC clients:
 
 There is one binary for each client, you can run them like this:
 
-```
+```shell
 $ go run send_message.go
 ```
 
-The gRPC go code generated from the .proto file was compiled with protoc
+The gRPC go code generated from the `.proto` files was compiled with `protoc`
 
-```
+```shell
 $ cd clients/go
 $ protoc --go_out=./protos --go_opt=paths=source_relative \
          --go_opt=Mchat.proto=grpc-sample.com/protos \
