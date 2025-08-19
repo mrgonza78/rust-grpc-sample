@@ -22,8 +22,9 @@ path = "src/live_chat.rs"
 [dependencies]
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 tokio-stream = "0.1"
-tonic = "0.13"
+tonic = { version = "0.13", features = ["tls-native-roots"] }
 prost = "0.13" # not the latest but the ones that works with tonic 0.13
+rustls = { version = "0.23.31", features = ["ring"] }
 
 [build-dependencies]
 tonic-build = "0.13"

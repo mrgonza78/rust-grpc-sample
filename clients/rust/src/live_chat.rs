@@ -6,14 +6,20 @@ use std::error::Error;
 use std::time::Duration;
 use tokio::time::sleep;
 use tokio_stream::{StreamExt, wrappers::ReceiverStream};
+use tonic::transport::{Channel, ClientTlsConfig};
 
-const SERVER_ADDR: &str = "http://[::1]:8080";
+const SERVER_ADDR: &str = "https://grpc-sample-35975833932.southamerica-west1.run.app"; // Demo server
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let pid = std::process::id();
     // Connect to the gRPC server
-    let mut grp_service = ChatServiceClient::connect(SERVER_ADDR).await?;
+    rustls::crypto::ring::default_provider().install_default().expect("Failed to install rustls crypto provider");
+    let tls = ClientTlsConfig::new()
+        .with_native_roots()
+        .assume_http2(true);    
+    let channel = Channel::from_static(SERVER_ADDR).tls_config(tls)?.connect().await?;
+    let mut grp_service = ChatServiceClient::new(channel);
 
     let (tx, rx) = tokio::sync::mpsc::channel(128);
 
