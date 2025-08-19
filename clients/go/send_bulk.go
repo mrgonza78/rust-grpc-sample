@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"os"
@@ -10,13 +11,14 @@ import (
 	proto "grpc-sample-client/protos"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 )
 
 func main() {
-	var addr = "localhost:8080"
+	var addr = "grpc-sample-35975833932.southamerica-west1.run.app" // Demo server
+	var tlsConfig = &tls.Config{InsecureSkipVerify: true}
 	// Set up a connection to the server.
-	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
