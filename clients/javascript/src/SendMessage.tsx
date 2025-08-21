@@ -32,12 +32,12 @@ function SendMessage() {
     <div className="SendMessage">
         <h2>SendMessage</h2>
         <form onSubmit={sendMessage}>
-          <input
-            type="text"
+          <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
             disabled={loading}
             placeholder="Type a message"
+            rows={4}
           />
           <button type="submit" disabled={loading || !input}>
             {loading ? 'Sending...' : 'Send'}
